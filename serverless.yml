@@ -1,0 +1,24 @@
+org: reflexer
+app: rai-stats-bot
+service: rai-stats-bot
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  region: 'us-west-2'
+  environment:
+    TYPE: "Hello world!"
+    CONSUMER_KEY: ${param:CONSUMER_KEY}
+    CONSUMER_SECRET: ${param:CONSUMER_SECRET}
+    ACCESS_TOKEN: ${param:ACCESS_TOKEN}
+    ACCESS_TOKEN_SECRET: ${param:ACCESS_TOKEN_SECRET}
+
+plugins:
+  - serverless-plugin-typescript
+
+functions:
+  tweetUpdate:
+    handler: index.tweetUpdate
+    timeout: 240
+    events:
+      - schedule: rate(8 hours)
