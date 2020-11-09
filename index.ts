@@ -23,6 +23,7 @@ export const tweetUpdate = async () => {
   // Fetch RAI stats from subgraph
   const stats = await getSubgraphData();
 
+  // Assemble Tweet
   const tweetContent = `🗿 PRAI update 🗿
 
 Market Price: $${stats.marketPrice}
@@ -35,7 +36,7 @@ Annual Redemption Rate: ${stats.annualizedRate}%
   console.log(`Posted Tweet id: ${id}`);
 };
 
-// Twitter endpoint functions
+// == Twitter endpoint functions ==
 
 // Post a Tweet
 const tweet = async (message: string, twit: Twit, mediaId?: string) => {
@@ -74,7 +75,8 @@ const twitterApiPost = async (path: string, params: Twit.Params, twit: Twit) =>
     });
   });
 
-// Get screenshot to post
+// == Screenshot ==
+
 const raiStatsScreenshot = async () => {
   const browser = await puppeteer.launch();
   const page = await browser.newPage();
@@ -89,7 +91,7 @@ const raiStatsScreenshot = async () => {
   await browser.close();
 };
 
-// Subgraph
+// == Subgraph ==
 
 const getSubgraphData = async () => {
   const res = await subgraphQuery(
