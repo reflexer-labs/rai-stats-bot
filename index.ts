@@ -1,7 +1,7 @@
 import Twit from "twit";
 import fs from "fs";
-import puppeteer from "puppeteer";
 import Axios from "axios";
+import chromeLambda from "chrome-aws-lambda"
 
 // Main
 export const tweetUpdate = async () => {
@@ -18,7 +18,7 @@ export const tweetUpdate = async () => {
   await raiStatsScreenshot();
 
   // Upload image to Twitter
-  const mediaId = await uploadImage("screenshot.png", twit);
+  const mediaId = await uploadImage("/tmp/screenshot.png", twit);
 
   // Fetch RAI stats from subgraph
   const stats = await getSubgraphData();
@@ -78,14 +78,17 @@ const twitterApiPost = async (path: string, params: Twit.Params, twit: Twit) =>
 // == Screenshot ==
 
 const raiStatsScreenshot = async () => {
-  const browser = await puppeteer.launch();
+  const browser = await chromeLambda.puppeteer.launch({
+    args: chromeLambda.args,
+    executablePath: await chromeLambda.executablePath,
+  });
   const page = await browser.newPage();
   await page.setViewport({ width: 600, height: 800 });
   await page.goto("https://stats.reflexer.finance/", {
     waitUntil: "networkidle0",
   });
   await page.screenshot({
-    path: "./screenshot.png",
+    path: "/tmp/screenshot.png",
     clip: { x: 0, y: 175, width: 600, height: 340 },
   });
   await browser.close();
