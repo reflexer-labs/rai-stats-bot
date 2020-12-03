@@ -121,8 +121,16 @@ const getSubgraphData = async () => {
     }`
   );
 
+  // Get ether price from CoinGecko
+  const ethPrice = parseFloat(
+    (
+      await Axios.get(
+        "https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd"
+      )
+    ).data.ethereum.usd
+  );
+
   // Parse and process data
-  const ethPrice = parseFloat(res.collateralType.currentPrice.value);
   const redemptionPrice = parseFloat(
     res.systemState.currentRedemptionPrice.value
   );
