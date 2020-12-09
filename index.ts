@@ -1,11 +1,10 @@
 import Twit from "twit";
 import fs from "fs";
 import Axios from "axios";
-import chromeLambda from "chrome-aws-lambda"
+import chromeLambda from "chrome-aws-lambda";
 
 // Main
 export const tweetUpdate = async () => {
-  
   // Configure Twitter API
   const twit = new Twit({
     consumer_key: process.env.CONSUMER_KEY as string,
@@ -24,10 +23,12 @@ export const tweetUpdate = async () => {
   const stats = await getSubgraphData();
 
   // Assemble Tweet
+  // Spacing made to align the prices with Twitter font
   const tweetContent = `🗿 PRAI update 🗿
 
-Market Price: $${stats.marketPrice}
-Redemption Price: $${stats.redemptionPrice}
+Market Price:           $${stats.marketPrice}
+Oracle Price:           $${stats.oraclePrice}
+Redemption Price:  $${stats.redemptionPrice}
 Annual Redemption Rate: ${stats.annualizedRate}%
 `;
 
@@ -87,6 +88,7 @@ const raiStatsScreenshot = async () => {
   await page.goto("https://stats.reflexer.finance/", {
     waitUntil: "networkidle0",
   });
+  await sleep(2000);
   await page.screenshot({
     path: "/tmp/screenshot.png",
     clip: { x: 0, y: 175, width: 600, height: 340 },
@@ -107,6 +109,9 @@ const getSubgraphData = async () => {
       }
       currentRedemptionRate {
         annualizedRate
+      }
+      currentCoinFsmUpdate {
+        value
       }
       
     }
@@ -139,10 +144,13 @@ const getSubgraphData = async () => {
     100;
   const uniswapPaiPrice = parseFloat(res.uniswapPair.token1Price);
 
+  const oraclePrice = parseFloat(res.systemState.currentCoinFsmUpdate.value);
+
   return {
     marketPrice: (uniswapPaiPrice * ethPrice).toFixed(4),
     redemptionPrice: redemptionPrice.toFixed(4),
     annualizedRate: annualizedRate.toFixed(2),
+    oraclePrice: oraclePrice.toFixed(4),
   };
 };
 
@@ -157,3 +165,5 @@ const subgraphQuery = async (host: string, query: string) => {
 
   return resp.data.data;
 };
+
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
