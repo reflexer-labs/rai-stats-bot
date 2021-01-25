@@ -108,9 +108,9 @@ const getSubgraphData = async () => {
         value
       }
       currentRedemptionRate {
-        annualizedRate
+        eightHourlyRate
       }
-      currentCoinFsmUpdate {
+      currentCoinMedianizerUpdate {
         value
       }
       
@@ -140,16 +140,16 @@ const getSubgraphData = async () => {
     res.systemState.currentRedemptionPrice.value
   );
   const annualizedRate =
-    (parseFloat(res.systemState.currentRedemptionRate.annualizedRate) - 1) *
+    (parseFloat(res.systemState.currentRedemptionRate.eightHourlyRate) - 1) *
     100;
   const uniswapPaiPrice = parseFloat(res.uniswapPair.token1Price);
 
-  const oraclePrice = parseFloat(res.systemState.currentCoinFsmUpdate.value);
+  const oraclePrice = parseFloat(res.systemState.currentCoinMedianizerUpdate.value);
 
   return {
     marketPrice: (uniswapPaiPrice * ethPrice).toFixed(4),
     redemptionPrice: redemptionPrice.toFixed(4),
-    annualizedRate: annualizedRate.toFixed(2),
+    annualizedRate: annualizedRate.toFixed(4),
     oraclePrice: oraclePrice.toFixed(4),
   };
 };
