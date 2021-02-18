@@ -13,12 +13,6 @@ export const tweetUpdate = async () => {
     access_token_secret: process.env.ACCESS_TOKEN_SECRET as string,
   });
 
-  // Fetch image
-  await raiStatsScreenshot();
-
-  // Upload image to Twitter
-  const mediaId = await uploadImage("/tmp/screenshot.png", twit);
-
   // Fetch RAI stats from subgraph
   const stats = await getSubgraphData();
 
@@ -26,14 +20,14 @@ export const tweetUpdate = async () => {
   // Spacing made to align the prices with Twitter font
   const tweetContent = `🗿 PRAI update 🗿
 
-Market Price:           $${stats.marketPrice}
-Oracle Price:           $${stats.oraclePrice}
-Redemption Price:  $${stats.redemptionPrice}
-Annual Redemption Rate: ${stats.annualizedRate}%
+Market Price: $${stats.marketPrice}
+Oracle Price: $${stats.oraclePrice}
+Redemption Price: $${stats.redemptionPrice}
+24-Hourly Redemption Rate: ${stats.annualizedRate}%
 `;
 
   // Post tweet
-  const id = await tweet(tweetContent, twit, mediaId);
+  const id = await tweet(tweetContent, twit);
   console.log(`Posted Tweet id: ${id}`);
 };
 
@@ -52,17 +46,6 @@ const tweet = async (message: string, twit: Twit, mediaId?: string) => {
   return data.id_str as string;
 };
 
-// Upload an image
-const uploadImage = async (imagePath: string, twit: Twit) => {
-  const b64content = fs.readFileSync(imagePath, { encoding: "base64" });
-  const uploadResult = await twitterApiPost(
-    "media/upload",
-    { media_data: b64content },
-    twit
-  );
-  return uploadResult.media_id_string as string;
-};
-
 // Generic Twitter API request
 const twitterApiPost = async (path: string, params: Twit.Params, twit: Twit) =>
   new Promise<any>((resolve, reject) => {
@@ -76,26 +59,6 @@ const twitterApiPost = async (path: string, params: Twit.Params, twit: Twit) =>
     });
   });
 
-// == Screenshot ==
-
-const raiStatsScreenshot = async () => {
-  const browser = await chromeLambda.puppeteer.launch({
-    args: chromeLambda.args,
-    executablePath: await chromeLambda.executablePath,
-  });
-  const page = await browser.newPage();
-  await page.setViewport({ width: 600, height: 800 });
-  await page.goto("https://stats.reflexer.finance/", {
-    waitUntil: "networkidle0",
-  });
-  await sleep(2000);
-  await page.screenshot({
-    path: "/tmp/screenshot.png",
-    clip: { x: 0, y: 175, width: 600, height: 340 },
-  });
-  await browser.close();
-};
-
 // == Subgraph ==
 
 const getSubgraphData = async () => {
@@ -108,7 +71,7 @@ const getSubgraphData = async () => {
         value
       }
       currentRedemptionRate {
-        eightHourlyRate
+        twentyFourHourlyRate
       }
       currentCoinMedianizerUpdate {
         value
@@ -120,7 +83,7 @@ const getSubgraphData = async () => {
           value
         }
       }
-      uniswapPair(id: "0xebde9f61e34b7ac5aae5a4170e964ea85988008c") {
+      uniswapPair(id: "0x8ae720a71622e824f576b4a8c03031066548a3b1") {
         token1Price
       }
     }`
@@ -140,11 +103,14 @@ const getSubgraphData = async () => {
     res.systemState.currentRedemptionPrice.value
   );
   const annualizedRate =
-    (parseFloat(res.systemState.currentRedemptionRate.eightHourlyRate) - 1) *
+    (parseFloat(res.systemState.currentRedemptionRate.twentyFourHourlyRate) -
+      1) *
     100;
   const uniswapPaiPrice = parseFloat(res.uniswapPair.token1Price);
 
-  const oraclePrice = parseFloat(res.systemState.currentCoinMedianizerUpdate.value);
+  const oraclePrice = parseFloat(
+    res.systemState.currentCoinMedianizerUpdate.value
+  );
 
   return {
     marketPrice: (uniswapPaiPrice * ethPrice).toFixed(4),

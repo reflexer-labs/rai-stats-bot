@@ -6,10 +6,6 @@ provider:
   name: aws
   runtime: nodejs12.x
   region: 'us-west-2'
-  layers:
-    # Google Chrome for AWS Lambda as a layer
-    # https://github.com/shelfio/chrome-aws-lambda-layer
-    - arn:aws:lambda:${self:provider.region}:764866452798:layer:chrome-aws-lambda:10
   environment:
     TYPE: "Hello world!"
     CONSUMER_KEY: ${param:CONSUMER_KEY}
@@ -30,4 +26,4 @@ functions:
     handler: index.tweetUpdate
     timeout: 240
     events:
-      - schedule: rate(8 hours)
+      - schedule: rate(20 hours)
