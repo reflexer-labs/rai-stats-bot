@@ -18,7 +18,7 @@ export const tweetUpdate = async () => {
 
   // Assemble Tweet
   // Spacing made to align the prices with Twitter font
-  const tweetContent = `🗿 PRAI update 🗿
+  const tweetContent = `🗿 RAI update 🗿
 
 Market Price: $${stats.marketPrice}
 Oracle Price: $${stats.oraclePrice}
