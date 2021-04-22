@@ -1,7 +1,5 @@
 import Twit from "twit";
-import fs from "fs";
 import Axios from "axios";
-import chromeLambda from "chrome-aws-lambda";
 
 // Main
 export const tweetUpdate = async () => {

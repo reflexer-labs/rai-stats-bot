@@ -14,8 +14,7 @@ provider:
     ACCESS_TOKEN_SECRET: ${param:ACCESS_TOKEN_SECRET}
 
 plugins:
-  - serverless-plugin-typescript
-  # - serverless-plugin-chrome
+  - serverless-webpack
 
 package:
   exclude:
@@ -27,3 +26,8 @@ functions:
     timeout: 240
     events:
       - schedule: rate(20 hours)
+
+custom:
+  webpack:
+    webpackConfig: './webpack.config.js'
+    includeModules: true
