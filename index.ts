@@ -21,7 +21,7 @@ export const tweetUpdate = async () => {
 Market Price: $${stats.marketPrice}
 Oracle Price: $${stats.oraclePrice}
 Redemption Price: $${stats.redemptionPrice}
-24-Hourly Redemption Rate: ${stats.annualizedRate}%
+Annualized Redemption Rate: ${stats.annualizedRate}%
 `;
 
   // Post tweet
@@ -69,7 +69,7 @@ const getSubgraphData = async () => {
         value
       }
       currentRedemptionRate {
-        twentyFourHourlyRate
+        annualizedRate
       }
       currentCoinMedianizerUpdate {
         value
@@ -101,7 +101,7 @@ const getSubgraphData = async () => {
     res.systemState.currentRedemptionPrice.value
   );
   const annualizedRate =
-    (parseFloat(res.systemState.currentRedemptionRate.twentyFourHourlyRate) -
+    (parseFloat(res.systemState.currentRedemptionRate.annualizedRate) -
       1) *
     100;
   const uniswapPaiPrice = parseFloat(res.uniswapPair.token1Price);
